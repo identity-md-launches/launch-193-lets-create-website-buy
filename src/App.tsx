@@ -41,7 +41,7 @@ import {
 } from "./trade";
 import { Icon, TokenIcon } from "./Icons";
 
-type ModalType = "wallet" | "settings" | "review" | null;
+type ModalType = "wallet" | "settings" | "review" | "pending" | null;
 type Approval = "checking" | "token" | "permit" | "ready" | "error";
 type Pending = { hash: Hash; kind: "approval" | "swap" };
 const short = (address: string) =>
@@ -144,6 +144,7 @@ export default function App() {
   const [tradeError, setTradeError] = useState("");
   const [status, setStatus] = useState("");
   const [copied, setCopied] = useState(false);
+  const [pendingAcknowledged, setPendingAcknowledged] = useState(false);
   const [pending, setPending] = useState<Pending | undefined>(() => {
     try {
       const p = JSON.parse(sessionStorage.getItem("imd.pending") || "null");
@@ -436,6 +437,7 @@ export default function App() {
     }
     if (minimum <= 0n) {
       setFieldError("The output is too small. Enter a larger amount.");
+      inputRef.current?.focus();
       return;
     }
     setStatus("");
@@ -492,6 +494,24 @@ export default function App() {
       );
       setBusy(false);
     }
+  }
+
+  function managePending() {
+    if (!pending || busy) return;
+    setPendingAcknowledged(false);
+    setModal("pending");
+  }
+
+  function stopTrackingPending() {
+    if (!pending || busy || !pendingAcknowledged) return;
+    setLastHash(pending.hash);
+    setPending(undefined);
+    setModal(null);
+    setTradeError("");
+    setStatus(
+      "Transaction tracking stopped. This does not cancel the transaction; it may still confirm. Check your wallet activity before starting another trade.",
+    );
+    setRetry((n) => n + 1);
   }
 
   async function confirm() {
@@ -786,7 +806,7 @@ export default function App() {
               <span>Ethereum token</span>
               <button
                 onClick={copyAddress}
-                aria-label="Copy IMD contract address"
+                aria-label={`Copy IMD contract address ${short(CONTRACTS.token)}`}
               >
                 {short(CONTRACTS.token)}
                 <Icon name={copied ? "check" : "copy"} size={14} />
@@ -985,6 +1005,7 @@ export default function App() {
                       type="button"
                       className="slippage-button"
                       disabled={locked}
+                      aria-label={`Maximum slippage: ${slippage / 100}%, change settings`}
                       onClick={() => setModal("settings")}
                     >
                       {slippage / 100}%<Icon name="settings" size={12} />
@@ -1004,8 +1025,8 @@ export default function App() {
                     {fieldError}
                   </p>
                   <p className="error" role="alert">
-                    {quoteError}
-                    {quoteError && (
+                    {modal !== "review" ? quoteError : ""}
+                    {quoteError && modal !== "review" && (
                       <>
                         {" "}
                         <button
@@ -1033,15 +1054,25 @@ export default function App() {
                   )}
                 </div>
                 {pending ? (
-                  <button
-                    type="button"
-                    className="primary-button"
-                    disabled={busy}
-                    onClick={checkPending}
-                  >
-                    {busy ? "Waiting for confirmation…" : "Check transaction"}
-                    <Icon name="refresh" size={18} />
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      className="primary-button"
+                      disabled={busy}
+                      onClick={checkPending}
+                    >
+                      {busy ? "Waiting for confirmation…" : "Check transaction"}
+                      <Icon name="refresh" size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary-button full"
+                      disabled={busy}
+                      onClick={managePending}
+                    >
+                      Manage pending transaction
+                    </button>
+                  </>
                 ) : (
                   <button
                     className="primary-button"
@@ -1224,6 +1255,44 @@ export default function App() {
         </div>
       </footer>
 
+      {modal === "pending" && pending && (
+        <Modal title="Manage pending transaction" close={() => setModal(null)}>
+          <p className="modal-description">
+            Check this transaction in your wallet activity and on Etherscan. If
+            it was replaced or cancelled while you were away, this site may be
+            unable to find its final receipt.
+          </p>
+          <p className="address-full">
+            <External href={`https://etherscan.io/tx/${pending.hash}`}>
+              {pending.hash}
+            </External>
+          </p>
+          <p className="approval-note">
+            Stopping tracking only removes this site’s pending state. It does
+            not cancel the transaction, which may still confirm. Starting
+            another trade could result in both transactions completing.
+          </p>
+          <label className="pending-acknowledgment">
+            <input
+              type="checkbox"
+              checked={pendingAcknowledged}
+              onChange={(e) => setPendingAcknowledged(e.target.checked)}
+            />
+            <span>
+              I checked my wallet activity and understand this transaction may
+              still confirm.
+            </span>
+          </label>
+          <button
+            className="secondary-button full"
+            disabled={busy || !pendingAcknowledged}
+            onClick={stopTrackingPending}
+          >
+            Stop tracking transaction
+          </button>
+        </Modal>
+      )}
+
       {modal === "wallet" && (
         <Modal
           title={account ? "Your wallet" : "Connect your wallet"}
@@ -1361,7 +1430,9 @@ export default function App() {
                 <strong>
                   {currentQuote
                     ? formatUnits(currentQuote.output, 18)
-                    : "Refreshing…"}{" "}
+                    : quoteLoading
+                      ? "Refreshing…"
+                      : "Quote unavailable"}{" "}
                   {receiveToken}
                 </strong>
               </span>
@@ -1401,6 +1472,9 @@ export default function App() {
           <p className="error" role="alert">
             {tradeError}
           </p>
+          <p className="error" role="alert">
+            {quoteError}
+          </p>
           <p role="status" className="review-status">
             {status}
           </p>
@@ -1416,17 +1490,30 @@ export default function App() {
               >
                 {busy ? "Waiting for confirmation…" : "Check transaction"}
               </button>
+              <button
+                className="secondary-button full"
+                disabled={busy}
+                onClick={managePending}
+              >
+                Manage pending transaction
+              </button>
             </>
           ) : expired || !currentQuote ? (
             <button
               className="primary-button"
-              disabled={quoteLoading}
+              disabled={locked || quoteLoading}
               onClick={() => {
                 setTradeError("");
                 setRetry((n) => n + 1);
               }}
             >
-              {quoteLoading ? "Refreshing quote…" : "Refresh expired quote"}
+              {busy
+                ? "Check your wallet…"
+                : quoteLoading
+                  ? "Refreshing quote…"
+                  : quoteError
+                    ? "Retry quote"
+                    : "Refresh expired quote"}
               <Icon name="refresh" size={18} />
             </button>
           ) : (

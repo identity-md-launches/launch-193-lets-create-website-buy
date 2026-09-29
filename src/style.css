@@ -1270,6 +1270,26 @@ dialog::backdrop {
   margin-block: 14px;
   color: var(--text-secondary);
 }
+.pending-acknowledgment {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-block: 20px;
+  padding: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  color: var(--text-secondary);
+  font-size: var(--text-ui);
+  line-height: 1.6;
+  cursor: pointer;
+}
+.pending-acknowledgment input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
 @media (hover: hover) {
   button:not(:disabled):hover {
     filter: brightness(0.97);

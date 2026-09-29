@@ -4,7 +4,7 @@ A static, responsive React + TypeScript application for buying and selling IMD a
 
 ## Run locally
 
-Use Node.js 22.12+ (Node 24.21.0 was used for validation) and npm.
+Use Node.js 22.12+ (Node 22.22.1 and npm 9.2.0 were used for validation) and npm.
 
 ```sh
 npm ci
@@ -22,11 +22,21 @@ npm run preview -- --host 127.0.0.1
 
 Open the preview URL printed by Vite. Serve the site over HTTP locally or HTTPS when published; opening `index.html` directly as a `file:` URL does not support module loading and wallet integrations reliably. No environment files, private keys, backend, API credentials, or vendored package registry are required.
 
-## Publish
+## Publish to IPFS
 
-Upload **the contents of `dist/`**, preserving `assets/` and `favicon.svg`, to a static HTTPS host or IPFS. Use the resulting directory CID for an ENS contenthash. `base: './'` in `vite.config.ts` produces relative script, stylesheet, font, and chunk URLs. Navigation uses in-page hashes, so server-side route rewrites are unnecessary. Check the published site at its actual gateway subpath.
+The release is the complete **`dist/` directory**, including `index.html`, `assets/`, the favicon and font license. The assignment publisher can serve this export directly. No public CID was published by this worker: no persistent IPFS node or pinning-service destination was supplied.
 
-After a source change, rebuild and include the complete new `dist/` alongside the source, `package.json`, and `package-lock.json`. Remove obsolete export files when replacing it. Do not include `node_modules/`, caches, temporary browser output, or package archives in a submission. No ignore file was created or changed for this assignment. Dependencies used during this work were installed in `/tmp/imd-market-build`, outside the submitted tree.
+With [IPFS Desktop](https://docs.ipfs.tech/how-to/websites-on-ipfs/single-page-website/), import `dist` as a **folder**, pin it, and copy the folder's CID. Alternatively, with an initialized [Kubo node](https://docs.ipfs.tech/how-to/pin-files/) running, from the repository root:
+
+```sh
+ipfs add -Q -r --cid-version=1 dist
+```
+
+The command prints the directory CID and pins it locally. Keep that node online, or upload the full folder to your pinning service and confirm it is pinned there. A CID alone does not guarantee public availability. Open `https://YOUR_GATEWAY/ipfs/YOUR_DIRECTORY_CID/`, with a trailing slash, and verify quotes, wallet connection and all assets. An ENS contenthash can point to the same directory CID. ENS publication and hosted pinning are separate deployment steps and were not performed here.
+
+Vite already uses `base: './'`; script, stylesheet, font and chunk URLs are relative. Navigation uses in-page hashes, so gateway subpaths work without server rewrites. Use HTTPS for the published gateway and a browser wallet or wallet in-app browser; there is no WalletConnect QR flow.
+
+After a source change, rebuild and include the complete new `dist/` alongside source and the existing manifest/lockfile. Remove obsolete export files. Do not include dependency directories, caches or package archives. No ignore file or protected build configuration was changed. Worker dependencies and npm caches stayed under `/tmp/`, outside the submitted tree.
 
 ## What works
 
@@ -35,13 +45,14 @@ After a source change, rebuild and include the complete new `dist/` alongside th
 - Slippage choices of 0.1%, 0.5% (default), and 1%; minimum output shown before confirmation. Quotes expire after 30 seconds.
 - Review and simulation before wallet submission. Sells request only the entered amount in each necessary approval, with a 20-minute Permit2 router permission. Each approval is a separate user action and refreshes the quote.
 - Direct Universal Router V2 execution for the configured pool, bounded input settlement, minimum output enforcement, and an ETH refund sweep on buys.
-- Pending receipt checks, reverts, wallet rejection, transaction links, and pending transaction recovery within the same browser tab via session storage.
+- Pending receipt checks, reverts, wallet rejection, transaction links, and pending transaction recovery within the same browser tab via session storage. If a cancelled/replaced transaction cannot be resolved, Manage pending transaction provides an explicit, acknowledged way to stop local tracking. This does not cancel the transaction.
+- Review values stay locked during wallet signing. Failed quote refreshes are shown inside the review dialog with a retry action.
 
 The integration uses native ETH and one fixed IMD pool. It does not offer arbitrary tokens, other networks, staking, bridging, WalletConnect, or liquidity provision. On mobile, use an Ethereum wallet's in-app browser that exposes `window.ethereum`. If multiple extensions are installed, their chosen injected provider is used; there is no separate wallet discovery chooser.
 
 ## Pool configuration
 
-Source of truth: [`src/contracts.ts`](src/contracts.ts). Address provenance and verification are in [`artifacts/validation.md`](artifacts/validation.md).
+Source of truth: [`src/contracts.ts`](src/contracts.ts). Address provenance and verification are in [`test/validation.md`](test/validation.md).
 
 | Item | Value |
 | --- | --- |
@@ -57,22 +68,30 @@ Before connection, reads use PublicNode with LlamaRPC as a fallback. After conne
 
 ## Actual validation
 
-On 2026-09-26, against the production export served under `/preview/`:
+The following ran on **2026-09-29** against the final export served at a local `/dist/` subpath:
 
-| Check | Result |
+| Check | Actual result |
 | --- | --- |
+| `npm ci` | Installed the unchanged lockfile in `/tmp/imd-site-verify` |
 | `npm run typecheck` | Passed, exit 0 |
 | `npm test` | 8 tests passed, 0 failed |
-| `npm run build` | Passed, exit 0; Vite 7.3.6; no final chunk-size warning |
-| Dependency audit after updating packages | 0 known vulnerabilities reported |
-| Browser interactions | Live buy/sell quotes; settings; keyboard and modal focus; copy/navigation; fixture wallet connect, chain switch, rejection, approvals, swap, revert, pending recovery, account changes, and failed-read recovery |
-| Production layout | Inspected at 1440, 1024, 768, 390, and 320 CSS pixels; no document horizontal overflow at checked widths |
-| Accessibility | axe-core 4.11.0 scan: no violations in final checked page states; keyboard, reduced motion, and forced colors checked |
-| Mainnet read-only simulation | Buy execution including ETH sweep succeeded; impossible minimum output reverted, at block `0x18db185` |
+| `npm run build` | Passed, exit 0; Vite 7.3.6 |
+| `test/browser-validation.js` via Playwright MCP | 22 interaction assertions passed, including the repaired signing, quote-error and pending-recovery cases |
+| Public browser quotes | Both buy and sell returned live mainnet estimates |
+| Mainnet checks | `test/mainnet-check.ts` passed at block 26084489: deployment identity, both quotes, buy router `eth_call`, and expected rejection of an impossible minimum |
+| Responsive layout | No document overflow at 1440, 1024, 768, 390 or 320 CSS pixels; screenshots inspected at 1440, 768, 390 and 320 |
+| Accessibility | axe-core 4.11.0: zero violations in checked main/settings/recovery states; dialog contrast required manual measurement. Keyboard, reduced motion, forced colors and 200% root-font enlargement also checked |
+| Export | Local assets resolve under `/dist/`; files match the production build. SHA-256 inventory in `test/export-manifest.json` |
 
-The build, typecheck, and test scripts ran in an isolated copy at `/tmp/imd-market-build`; the exact output was copied into this repository's `dist/`. Normal `npm ci` and the commands above reproduce that workflow without the temporary path. Nothing in `test/scratch/` is needed to build or run the website.
+The build ran in an isolated copy with the original configuration and dependencies, and its exact export was copied back. Ordinary `npm ci` plus the scripts above reproduces it. Additional read-only chain checks can be run with `npx tsx test/mainnet-check.ts 26084489`; historical RPC support is required. [Browser reproduction instructions](test/browser-checks.md) explain the fixture and script.
 
-**No funded wallet transaction was signed or broadcast.** Wallet transaction paths were exercised with the local-only fixture in [`test/wallet-fixture.js`](test/wallet-fixture.js); the live router checks used `eth_call` with a temporary balance override. These checks do not establish live wallet compatibility across vendors or constitute a contract audit. Physical mobile devices, assistive screen readers, native browser zoom, and post-publication behavior were not tested. See the consolidated [six-domain review, fixes, evidence, and limitations](artifacts/validation.md) and [browser reproduction notes](test/browser-checks.md).
+**No funded transaction was signed or broadcast.** Wallet sends and receipts were local fixture responses; the live buy simulation used `eth_call` with a hypothetical balance override. Sell execution was checked with the fixture, not a funded mainnet wallet. These checks are not a contract audit.
+
+PublicNode intermittently returned HTTP 429; the LlamaRPC fallback returned CORS/TLS errors during this run. The interface remained usable, displayed unavailable/retry states and worked with the fixture wallet provider. Live trades require a working mainnet provider, wallet support, liquidity and ETH for fees. No vendor wallet matrix, physical-device test, screen-reader session, native browser zoom or public-IPFS retrieval was performed. See [the six-domain review and exact limitations](test/validation.md).
+
+## Submission size
+
+The final byte audit found the source/export snapshot below 0.82 MiB, with the separate evidence artifacts and existing Git metadata bringing the conservative combined raw total below 1.90 MiB (limit: 8 MiB). `dist/` is 571,654 bytes across eight files. No dependency directory, cache, registry mirror, archive or symlink is included. Protected configuration and dependency files are unchanged; no ignore rule was changed. Saved screenshots live in `artifacts/`; the validation report and JSON evidence are also included under `test/` so the source submission remains self-contained.
 
 ## Source map
 

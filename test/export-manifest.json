@@ -1,0 +1,47 @@
+{
+  "staticAssetReferences": "passed",
+  "fileCount": 8,
+  "totalBytes": 571654,
+  "files": [
+    {
+      "path": "dist/assets/ethereum-CCQ99zK9.js",
+      "bytes": 288793,
+      "sha256": "0fad9a78ee9f3dd13a1a4c2f015e905ba3b64566ac73b4a5459ea1229f317d48"
+    },
+    {
+      "path": "dist/assets/index-99DLuEIx.css",
+      "bytes": 25720,
+      "sha256": "1e9c25f02082394d1d3395abd2c60739eae2a0d16b7dbd1601ae243c20744c8b"
+    },
+    {
+      "path": "dist/assets/index-DCW02TRM.js",
+      "bytes": 34373,
+      "sha256": "fdb65165356fa4276ce318a41a6137124279ff91aa0276a842f4ee146b384d0e"
+    },
+    {
+      "path": "dist/assets/manrope-latin-DHIcAJRg.woff2",
+      "bytes": 24836,
+      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+    },
+    {
+      "path": "dist/assets/react-CampNIbe.js",
+      "bytes": 192492,
+      "sha256": "7de5cafca473638ace5f7ef2d89ea5d297c909e333d4ff5ddf6ccff7c5580560"
+    },
+    {
+      "path": "dist/favicon.svg",
+      "bytes": 180,
+      "sha256": "7796f6d6e56482222c857855ef1f1333066f385d98371daa3868fd415a154088"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 877,
+      "sha256": "d3b92520ce557045bcc009b0db46909be115a03a891f88c6eb7e3f017b47c448"
+    },
+    {
+      "path": "dist/manrope-OFL.txt",
+      "bytes": 4383,
+      "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+    }
+  ]
+}

@@ -14,6 +14,8 @@
     chain: "0xaa36a7",
     rejectConnect: false,
     rejectSend: false,
+    holdSend: false,
+    releaseSend: null,
     failReads: false,
     receipt: "success",
     transactions: [],
@@ -75,6 +77,8 @@
         return packed(2n ** 96n, 0, 0, 10000);
       }
       if (method === "eth_sendTransaction") {
+        if (test.holdSend)
+          await new Promise((resolve) => { test.releaseSend = resolve; });
         if (test.rejectSend)
           throw Object.assign(new Error("User rejected"), { code: 4001 });
         const tx = params[0];

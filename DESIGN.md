@@ -30,15 +30,15 @@ The implementation uses sRGB hex values, with neutral/blue primitives mapped to 
 | `--error` | `#b02c39` | Recoverable form/transaction errors |
 | `--warning` | `#856222` | Unavailable market indicator |
 
-The ETH token glyph additionally uses `#627493` on `#eaedf5` as an asset color. There is one light theme. Forced-colors mode preserves system colors and adds explicit selection outlines. Status always has adjacent text; a dot alone is never the only signal. Rendered contrast measurements and the correction to muted text are in `artifacts/validation.md`.
+The ETH token glyph additionally uses `#627493` on `#eaedf5` as an asset color. There is one light theme. Forced-colors mode preserves system colors and adds explicit selection outlines. Status always has adjacent text; a dot alone is never the only signal. Rendered contrast measurements and review limitations are in `test/validation.md`.
 
 ## Typography
 
 - **Family:** local variable Manrope, then Arial and generic sans-serif. `src/assets/manrope-latin.woff2` provides normal weights 200–800; the UI uses 400–800. `font-display: swap`; no remote font service at runtime.
 - **Display:** `--text-display: clamp(2.8rem, 4.6vw, 4rem)`, weight 650, line-height 1.14, letter-spacing -2.8px. Responsive overrides set 3.1rem, 2.65rem, or 2.7rem at the specified breakpoints.
-- **Section heading:** 1.625rem, weight 650, line-height 1.3, letter-spacing -0.85px; 1.45rem at medium widths and 1.6rem on the stacked layout. Swap title is 1.25rem; dialog heading is 1.35rem.
+- **Section heading:** 1.75rem, weight 650, line-height 1.3, letter-spacing -0.85px; 1.45rem at medium widths and 1.6rem on the stacked layout. Swap title is 1.25rem; dialog heading is 1.35rem.
 - **Body:** 1rem; hero description 1.125rem on wide screens, 1rem on smaller screens. Paragraph line-height defaults to 1.65. Supporting short descriptions are 0.8125rem with 1.7 line-height, reduced to 0.75rem on mobile.
-- **UI:** 0.875rem controls, 0.8125rem compact text, 0.75rem captions. Only the narrowest network badge uses 0.6875rem (11px). Captions were increased during review.
+- **UI:** 0.875rem controls, 0.8125rem compact text, 0.75rem captions. The network badge at the narrowest breakpoint and the intro eyebrow below 54rem use 0.6875rem (11px).
 - **Amounts:** 2rem at full width, 1.75rem at the smallest breakpoint, with tabular numerals. Transaction encoding always retains bigint precision; the public estimate is rounded for display and the review shows its exact decimal value.
 
 Headings use balanced wrapping; descriptions use pretty wrapping. Full addresses and exact review amounts wrap with `overflow-wrap: anywhere`. Supporting paragraph measures are limited to roughly 32–51 characters. The local font was observed loaded in the production browser.
@@ -56,7 +56,7 @@ The stylesheet declares a spacing scale of 4, 8, 12, 16, 20, 24, 32, 40, 48, and
 
 The main swap action remains in normal flow, inset from the viewport. Nothing is fixed over mobile content. Dialogs have a maximum height of `calc(100dvh - 32px)` and scroll internally. Market decoration uses a wrapping flex layout so it cannot obscure an enlarged price.
 
-Production viewports at 1440, 1024, 768, 390, and 320 CSS pixels were checked for reflow. A 200% root-font enlargement was also inspected; this is a text-resize check, not native browser zoom. The page is English and does not promise RTL/localization support.
+Production viewports at 1440, 1024, 768, 390, and 320 CSS pixels were checked for document overflow; screenshots were inspected at 1440, 768, 390, and 320 CSS pixels. A 200% root-font enlargement was also inspected; this is a text-resize check, not native browser zoom. The page is English and does not promise RTL/localization support.
 
 ## Elevation & depth
 
@@ -75,13 +75,16 @@ Swap and dialog shells use 22px corners. Amount panels use 12px; primary actions
 | `Icon` | `src/Icons.tsx` | Named SVG icons; `currentColor`, 1.6px stroke, configurable size, decorative `aria-hidden` |
 | `TokenIcon` | `src/Icons.tsx` | IMD/ETH and small variants; never mistaken for a token picker |
 | `External` | `src/App.tsx` | Named destination, external-link icon, hidden new-tab announcement, safe `rel` |
-| `Modal` | `src/App.tsx:73` | Native dialog, labelled heading, close button, Escape, background inertness, focus restored to trigger |
+| `Modal` | `src/App.tsx`, `Modal` | Native dialog, labelled heading, close button, Escape, background inertness, focus restored to trigger |
 | Direction switch | `.direction-switch` | Group of native pressed buttons; clears the previous amount and quote on direction change |
 | Amount panel | `.amount-panel` | Persistent label, decimal keyboard, inline error association, focused input, tabular numbers; presets are real buttons |
 | Primary action | `.primary-button` | One filled blue action; labels reflect connect, switch network, quote, review, approval, pending, or confirmation states |
 | Secondary actions | `.wallet-button`, `.text-button`, `.icon-button`, `.inline-link` | Tinted wallet entry, neutral utility actions, explicitly labelled icons, in-context recovery |
 | Slippage selection | `.slippage-options` | Native labelled radios; checked border/fill; arrows navigate and Space selects |
+| Pending recovery | `.pending-acknowledgment` in `src/style.css`; pending modal in `src/App.tsx` | Full transaction hash wraps. A native checkbox with a padded wrapping label requires acknowledgment before stopping local tracking. The copy explicitly states this does not cancel the on-chain transaction. |
 | Transaction feedback | `.global-feedback`, `.review-status` | Stable polite status regions; only the active surface speaks status; field and transaction errors use alerts |
+
+Quote refresh is disabled while a wallet request is outstanding. Quote failures appear inside the review dialog with a retry action, and the unavailable estimate is labelled explicitly.
 
 Focus uses a 3px blue perimeter with 4px offset, and system Highlight in forced colors. Inputs use a 2px focus outline. Most touch controls are 39–53px tall; compact presets and inline utility controls meet the 24px minimum or the inline-text exception. There are no autoplay, loading shimmer, or entrance animations. Color/background/press transitions are 150ms only when reduced motion is not requested; press scale is 0.96.
 

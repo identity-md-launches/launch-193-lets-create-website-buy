@@ -1,0 +1,104 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-09-29T17:08:23.994Z",
+  "completedAt": "2026-09-29T17:08:27.785Z",
+  "chainId": 1,
+  "blockNumber": "26084489",
+  "blockHash": "0x5356cb1e09c072ea387cacca4ed1edccae48f15e7e12c4854df94ad9bd671301",
+  "blockTimestamp": "2026-09-29T17:02:23.000Z",
+  "endpoints": [
+    "https://ethereum-rpc.publicnode.com",
+    "https://1rpc.io/eth",
+    "https://eth.drpc.org",
+    "https://rpc.flashbots.net"
+  ],
+  "contracts": {
+    "token": "0xD34a99Bc0f67aE1bbd63C660e6d0b0dd03E263B7",
+    "hook": "0xc6c965bd164c483e87d0b550671798e9a3602840",
+    "manager": "0x000000000004444c5dc75cB358380D2e3dE08A90",
+    "stateView": "0x7ffe42c4a5deea5b0fec41c94c136cf115597227",
+    "quoter": "0x52f0e24d1c21c8a0cb1e5a5dd6198556bd9e1203",
+    "router": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+    "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+  },
+  "poolKey": {
+    "currency0": "0x0000000000000000000000000000000000000000",
+    "currency1": "0xD34a99Bc0f67aE1bbd63C660e6d0b0dd03E263B7",
+    "fee": 10000,
+    "tickSpacing": 60,
+    "hooks": "0xc6c965bd164c483e87d0b550671798e9a3602840"
+  },
+  "computedPoolId": "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704",
+  "onChainPoolId": "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704",
+  "onChainToken": "0xD34a99Bc0f67aE1bbd63C660e6d0b0dd03E263B7",
+  "lpFee": 10000,
+  "tokenDecimals": 18,
+  "codeBytes": {
+    "token": 22990,
+    "hook": 21126,
+    "manager": 24009,
+    "stateView": 3531,
+    "quoter": 5820,
+    "router": 19499,
+    "permit2": 9152
+  },
+  "slot0": [
+    "1483659503291453369001401514896",
+    58601,
+    0,
+    10000
+  ],
+  "liquidity": "421685737537387370394",
+  "quotes": {
+    "buy": {
+      "amountIn": "1000000000000000",
+      "amountOut": "347156594545725001",
+      "gasEstimate": "145765"
+    },
+    "sell": {
+      "amountIn": "1000000000000000000",
+      "amountOut": "2822743609184525",
+      "gasEstimate": "145436"
+    }
+  },
+  "buyRouterSimulation": {
+    "status": "passed",
+    "method": "eth_call",
+    "account": "0x000000000000000000000000000000000000dEaD",
+    "stateOverride": {
+      "balance": "1000000000000000000"
+    },
+    "commands": "0x1004",
+    "minimumOutput": "345420811572996375",
+    "impossibleMinimum": {
+      "status": "rejected as expected",
+      "minimumOutput": "340282366920938463463374607431768211455",
+      "abiItem": {
+        "name": "V4TooLittleReceived",
+        "type": "error",
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "minAmountOutReceived"
+          },
+          {
+            "type": "uint256",
+            "name": "amountReceived"
+          }
+        ]
+      },
+      "args": [
+        "340282366920938463463374607431768211455",
+        "347156594545725001"
+      ],
+      "errorName": "V4TooLittleReceived"
+    }
+  },
+  "limitations": [
+    "Read-only calls; no transaction was signed or broadcast.",
+    "Buy execution uses a hypothetical account balance override, not a funded wallet.",
+    "Sell quote was simulated; sell router execution, approvals, wallet signing and receipts were not validated by this script.",
+    "Public RPC availability, historical state and state overrides depend on provider support; individual successful endpoints are not logged.",
+    "Nonempty bytecode is checked, not a deployed-bytecode audit against source."
+  ]
+}
