@@ -1,7 +1,15 @@
 {
+  "generated": "2026-09-30",
   "staticAssetReferences": "passed",
-  "fileCount": 8,
-  "totalBytes": 571654,
+  "references": [
+    "./favicon.svg",
+    "./assets/index-DhMRWY8k.js",
+    "./assets/react-CampNIbe.js",
+    "./assets/ethereum-CCQ99zK9.js",
+    "./assets/index-BCLf5nwu.css"
+  ],
+  "fileCount": 11,
+  "totalBytes": 609868,
   "files": [
     {
       "path": "dist/assets/ethereum-CCQ99zK9.js",
@@ -9,19 +17,34 @@
       "sha256": "0fad9a78ee9f3dd13a1a4c2f015e905ba3b64566ac73b4a5459ea1229f317d48"
     },
     {
-      "path": "dist/assets/index-99DLuEIx.css",
-      "bytes": 25720,
-      "sha256": "1e9c25f02082394d1d3395abd2c60739eae2a0d16b7dbd1601ae243c20744c8b"
+      "path": "dist/assets/ibm-plex-mono-latin-400-normal-Dm_PoFIZ.woff2",
+      "bytes": 14812,
+      "sha256": "3c5a451f9ec27a354b0c2bcca636c6ec17a651281aabf29f8427e210a1d31e85"
     },
     {
-      "path": "dist/assets/index-DCW02TRM.js",
-      "bytes": 34373,
-      "sha256": "fdb65165356fa4276ce318a41a6137124279ff91aa0276a842f4ee146b384d0e"
+      "path": "dist/assets/ibm-plex-mono-latin-500-normal-C_OblDzq.woff2",
+      "bytes": 14988,
+      "sha256": "756026ff72eb76fd971ac4b7504cec55eef62109d2684c2cad8da32170b80b37"
     },
     {
-      "path": "dist/assets/manrope-latin-DHIcAJRg.woff2",
-      "bytes": 24836,
-      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+      "path": "dist/assets/ibm-plex-mono-latin-600-normal-rgB1DpUr.woff2",
+      "bytes": 15704,
+      "sha256": "c4d3deb734a27e6d0dc7a6b464779f70ba1c272e26287860a14e35e85acb5b76"
+    },
+    {
+      "path": "dist/assets/ibm-plex-mono-latin-700-normal-QW6cfU13.woff2",
+      "bytes": 14956,
+      "sha256": "a51b6594bdda5d76e047259fb1fcaf7af2eb227cac553b4eb1cffa8328784c9c"
+    },
+    {
+      "path": "dist/assets/index-BCLf5nwu.css",
+      "bytes": 25363,
+      "sha256": "cb5e861defb15fd2d12c251706c544ad38d5786f12f226fae93ea22a365d54c3"
+    },
+    {
+      "path": "dist/assets/index-DhMRWY8k.js",
+      "bytes": 36999,
+      "sha256": "750bc5f2708b513916e925871e8b680696d8b69ae27b1e0040932ba24b3efcdd"
     },
     {
       "path": "dist/assets/react-CampNIbe.js",
@@ -30,18 +53,18 @@
     },
     {
       "path": "dist/favicon.svg",
-      "bytes": 180,
-      "sha256": "7796f6d6e56482222c857855ef1f1333066f385d98371daa3868fd415a154088"
+      "bytes": 313,
+      "sha256": "bf7cf5a52b2e3d20232651c9715303823875c91fb82eb35590304448df5dccd1"
+    },
+    {
+      "path": "dist/ibm-plex-mono-OFL.txt",
+      "bytes": 4314,
+      "sha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3"
     },
     {
       "path": "dist/index.html",
-      "bytes": 877,
-      "sha256": "d3b92520ce557045bcc009b0db46909be115a03a891f88c6eb7e3f017b47c448"
-    },
-    {
-      "path": "dist/manrope-OFL.txt",
-      "bytes": 4383,
-      "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+      "bytes": 1134,
+      "sha256": "559f7033eb461955f4c4c59b0e69468898a6ffb5211a8b26b65851caea03c685"
     }
   ]
 }

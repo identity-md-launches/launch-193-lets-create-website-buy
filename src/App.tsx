@@ -39,13 +39,32 @@ import {
   QUOTE_LIFETIME,
   type Direction,
 } from "./trade";
-import { Icon, TokenIcon } from "./Icons";
+import { Frog, Icon, TokenIcon } from "./Icons";
 
 type ModalType = "wallet" | "settings" | "review" | "pending" | null;
 type Approval = "checking" | "token" | "permit" | "ready" | "error";
 type Pending = { hash: Hash; kind: "approval" | "swap" };
+type Theme = "dark" | "light";
 const short = (address: string) =>
   `${address.slice(0, 6)}…${address.slice(-4)}`;
+const readTheme = (): Theme =>
+  document.documentElement.dataset.theme === "light" ? "light" : "dark";
+/* Same storage key and attribute as imd.fun, so the choice reads the same way. */
+function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+  root.classList.add("theme-switching");
+  root.dataset.theme = theme;
+  void root.offsetHeight;
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", theme === "light" ? "#ffffff" : "#000000");
+  requestAnimationFrame(() => root.classList.remove("theme-switching"));
+  try {
+    localStorage.setItem("imd-theme", theme);
+  } catch {
+    /* Storage is optional. */
+  }
+}
 
 function External({
   href,
@@ -158,6 +177,7 @@ export default function App() {
     }
   });
   const [lastHash, setLastHash] = useState<Hash>();
+  const [theme, setTheme] = useState<Theme>(readTheme);
   const inputRef = useRef<HTMLInputElement>(null);
   const session = useRef(0);
   const buy = direction === "buy";
@@ -654,6 +674,12 @@ export default function App() {
     }
   }
 
+  function toggleTheme() {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    applyTheme(next);
+    setTheme(next);
+  }
+
   const primaryLabel = !account
     ? "Connect wallet"
     : chainId !== 1
@@ -674,41 +700,55 @@ export default function App() {
         Skip to content
       </a>
       <header className="header">
-        <div className="header-inner">
-          <a href="#" className="brand" aria-label="IMD Market home">
-            <span className="brand-mark">
-              <TokenIcon token="IMD" />
+        <div className="nav-sites">
+          <a href="#trade" className="pill" aria-label="IMD Market home">
+            <span className="pill-mark">
+              <Icon name="diamond" size={14} />
             </span>
-            <span>
-              imd<span className="brand-dot">.</span>
-            </span>
-            <span className="brand-divider" />
-            <span className="brand-product">market</span>
+            <span className="pill-brand">IMD</span>
           </a>
-          <nav aria-label="Main navigation">
-            <a className="nav-active" href="#trade">
+          <nav className="pill" aria-label="Main navigation">
+            <a className="pill-cell" aria-current="true" href="#trade">
               Trade
             </a>
-            <a href="#pool">Pool</a>
-            <a href="#about">
-              About IMD
-              <Icon name="chevron" size={13} />
+            <a className="pill-cell" href="#pool">
+              Pool
+            </a>
+            <a
+              className="pill-cell"
+              href="https://imd.fun"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              imd.fun
+              <Icon name="external" size={12} />
+              <span className="sr-only"> (opens a new tab)</span>
             </a>
           </nav>
-          <div className="header-actions">
-            <span className="network-label">
-              <TokenIcon token="ETH" small />
-              Ethereum
-            </span>
+        </div>
+        <div className="nav-tools">
+          <button
+            type="button"
+            className="nav-icon"
+            aria-label={
+              theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+            }
+            onClick={toggleTheme}
+          >
+            <Icon name={theme === "dark" ? "sun" : "moon"} size={20} />
+          </button>
+          <div className="pill">
             <button
-              className="wallet-button"
+              className={
+                account ? "pill-cell wallet-button connected" : "pill-cell wallet-button"
+              }
               disabled={busy}
               onClick={() => {
                 setWalletError("");
                 setModal("wallet");
               }}
             >
-              <Icon name="wallet" size={17} />
+              <Icon name="wallet" size={16} />
               <span>{account ? short(account) : "Connect wallet"}</span>
             </button>
           </div>
@@ -722,18 +762,17 @@ export default function App() {
         >
           <div className="intro">
             <div className="eyebrow">
-              <span className="small-diamond" /> An open market. A shared
-              future.
+              <Icon name="diamond" size={12} />A swarm in the sky. Feels good,
+              man.
             </div>
             <h1 id="hero-title">
-              Trade IMD.
+              Get IMD.
               <br />
-              <span>On your terms.</span>
+              <span>Buy it. Hold it.</span>
             </h1>
             <p className="intro-copy">
-              Buy and sell directly on Ethereum.
-              <br />
-              Your wallet. Your tokens. Your next move.
+              Swap ETH for IMD on Ethereum mainnet. Every sell burns supply, and
+              every trade is signed in your own wallet.
             </p>
             <div className="intro-features">
               <span>
@@ -741,12 +780,16 @@ export default function App() {
                 Self-custody
               </span>
               <span>
+                <Icon name="flame" size={16} />
+                Sells burn supply
+              </span>
+              <span>
                 <Icon name="layers" size={16} />
-                Powered by Uniswap v4
+                Uniswap v4 · POOL4 hook
               </span>
             </div>
-            <div className="market-card">
-              <div className="market-top">
+            <div className="card market-card">
+              <div className="card-head">
                 <div className="market-identity">
                   <TokenIcon token="IMD" />
                   <div>
@@ -768,17 +811,11 @@ export default function App() {
                     <span>ETH</span>
                   </div>
                 </div>
-                <div className="market-art" aria-hidden="true">
-                  <div className="orbit orbit-one" />
-                  <div className="orbit orbit-two" />
-                  <div className="orbit orbit-three" />
-                  <span className="orbit-token">
-                    <TokenIcon token="IMD" />
-                  </span>
-                  <span className="orbit-dot" />
+                <div className="mascot" aria-hidden="true">
+                  <Frog />
                 </div>
               </div>
-              <div className="market-bottom">
+              <div className="card-foot">
                 <span
                   className={
                     marketError ? "data-status unavailable" : "data-status"
@@ -1053,57 +1090,54 @@ export default function App() {
                     </p>
                   )}
                 </div>
-                {pending ? (
-                  <>
+                <div className="swap-actions">
+                  {pending ? (
+                    <>
+                      <button
+                        type="button"
+                        className="primary-button"
+                        disabled={busy}
+                        onClick={checkPending}
+                      >
+                        {busy
+                          ? "Waiting for confirmation…"
+                          : "Check transaction"}
+                        <Icon name="refresh" size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary-button full"
+                        disabled={busy}
+                        onClick={managePending}
+                      >
+                        Manage pending transaction
+                      </button>
+                    </>
+                  ) : (
                     <button
-                      type="button"
                       className="primary-button"
-                      disabled={busy}
-                      onClick={checkPending}
+                      type="submit"
+                      disabled={
+                        busy || connecting || (quoteLoading && walletReady)
+                      }
                     >
-                      {busy ? "Waiting for confirmation…" : "Check transaction"}
-                      <Icon name="refresh" size={18} />
+                      {connecting ? "Opening wallet…" : primaryLabel}
+                      <Icon name={!account ? "wallet" : "arrow"} size={18} />
                     </button>
-                    <button
-                      type="button"
-                      className="secondary-button full"
-                      disabled={busy}
-                      onClick={managePending}
-                    >
-                      Manage pending transaction
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    className="primary-button"
-                    type="submit"
-                    disabled={
-                      busy || connecting || (quoteLoading && walletReady)
-                    }
-                  >
-                    {connecting ? "Opening wallet…" : primaryLabel}
-                    <Icon name={!account ? "wallet" : "arrow"} size={18} />
-                  </button>
-                )}
-                <p className="swap-note">
-                  <Icon name="shield" size={13} />
-                  You stay in control. Every trade is signed by you.
-                </p>
+                  )}
+                  <p className="swap-note">
+                    <Icon name="shield" size={13} />
+                    You stay in control. Every trade is signed by you.
+                  </p>
+                </div>
               </form>
             </div>
             <div className="powered-line">
               <span className="uniswap-mark" aria-hidden="true">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="m12 1 3 8 8 3-8 3-3 8-3-8-8-3 8-3z" />
-                </svg>
+                <Icon name="diamond" size={12} />
               </span>
               Built on Uniswap v4<span className="middot">·</span>Settled on
-              Ethereum
+              Ethereum<span className="middot">·</span>Sells burn IMD
             </div>
           </div>
         </section>
@@ -1134,11 +1168,11 @@ export default function App() {
         >
           <div className="section-heading">
             <div>
-              <span className="eyebrow">Less friction. More ownership.</span>
+              <span className="eyebrow">How it works</span>
               <h2 id="about-heading">From your wallet. To your wallet.</h2>
             </div>
             <External href="https://imd.fun/token/">
-              Explore IdentityMD
+              Read about $IMD on imd.fun
             </External>
           </div>
           <div className="steps">
@@ -1200,8 +1234,8 @@ export default function App() {
               </div>
               <p>
                 This interface routes swaps through the IMD pool with the POOL4
-                hook. The 1% pool fee is included in your quote; Ethereum
-                network fees are separate.
+                hook, which burns a cut of every sell. The 1% pool fee is
+                included in your quote; Ethereum network fees are separate.
               </p>
               <External href="https://pool4.imd.fun/docs">
                 Read about the pool and its hook
@@ -1243,14 +1277,25 @@ export default function App() {
         </section>
       </main>
       <footer>
-        <div className="footer-brand">
-          <TokenIcon token="IMD" small />
-          <strong>imd market</strong>
-          <span>An independent interface for the IMD community.</span>
+        <div className="foot-row">
+          <div className="foot-brand">
+            <div>
+              <span className="foot-frog" aria-hidden="true">
+                <Frog size={36} />
+              </span>
+              IMD Market
+            </div>
+            <span>An independent interface for the IMD community.</span>
+          </div>
+          <div className="foot-links">
+            <External href="https://imd.fun">imd.fun</External>
+            <External href="https://imd.fun/docs/">Docs</External>
+            <External href="https://explorer.imd.fun">Explorer</External>
+            <External href="https://pool4.imd.fun/docs">Pool docs</External>
+          </div>
         </div>
-        <div>
-          <External href="https://imd.fun">IdentityMD</External>
-          <External href="https://pool4.imd.fun/docs">Pool docs</External>
+        <div className="foot-bar">
+          <span>Ethereum mainnet · Uniswap v4 · Every trade signed by you.</span>
           <a href="#trade">Back to trade ↑</a>
         </div>
       </footer>

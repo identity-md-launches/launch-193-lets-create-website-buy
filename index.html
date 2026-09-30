@@ -1,15 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f6f8fc" />
+    <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Buy and sell IMD on Ethereum through its Uniswap v4 pool. Live quotes, clear fees, and trades signed in your own wallet."
+      content="Get IMD on Ethereum through its Uniswap v4 pool. Live quotes, clear fees, and every trade signed in your own wallet."
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <title>IMD Market — Your wallet. Your move.</title>
+    <title>IMD Market — Get IMD on Ethereum</title>
+    <script>
+      (function () {
+        var t = "dark";
+        try {
+          if (localStorage.getItem("imd-theme") === "light") t = "light";
+        } catch (e) {}
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

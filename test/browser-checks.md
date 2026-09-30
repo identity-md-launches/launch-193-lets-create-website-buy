@@ -26,6 +26,10 @@ The fixture starts on Sepolia. Connect, then use Switch to Ethereum and confirm 
 
 To avoid waiting for expiry in a test, temporarily advance `Date.now` by 31 seconds. Leave the clock advanced while requesting the next quote, then restore it; never use this modification for a real transaction.
 
+## Theme and restyle checks (2026-09-30)
+
+The site now defaults to the dark imd.fun theme and stores a light choice under `localStorage["imd-theme"]`. Toggle the theme from the header button and confirm `document.documentElement.dataset.theme`, the stored value and `meta[name=theme-color]` change together, then repeat the layout checks below in both themes. The 2026-09-30 worker ran the direction, preset, reverse, wallet-dialog, settings-focus and hash-navigation checks with real browser clicks and DOM readback, because the recorded script below could not be executed in that session; see `validation.md`.
+
 ## Layout and accessibility
 
 Inspect actual screenshots at 1440, 1024, 768, 390, and 320 CSS pixels; compare `document.documentElement.scrollWidth` with the viewport width. Check the main page and open dialogs, not only an accessibility tree. Inspect 200% text enlargement separately from native browser zoom. Emulate reduced motion and forced colors; confirm visible keyboard focus and selected radio state.
